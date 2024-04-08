@@ -22,9 +22,13 @@ function restricted(req, res, next) {
 */
 async function checkUsernameFree(req, res, next) {
   try {
-    const user = await User.findBy({ username: req.body.username });
-    if (!user) next();
-    else next({ "message": "Username taken" });
+    const users = await User.findBy({ username: req.body.username });
+    if (!users.length) {
+      next();
+    } 
+    else {
+      next({ "message": "Username taken" });
+    } 
   } catch (err) {
     next(err);
   }
@@ -38,8 +42,18 @@ async function checkUsernameFree(req, res, next) {
     "message": "Invalid credentials"
   }
 */
-function checkUsernameExists(req, res, next) {
-  next();
+async function checkUsernameExists(req, res, next) {
+ try {
+  const user = await User.findBy({username: req.body.username});
+  if(!user) {
+    next();
+  } else {
+    res.status(401).json({"message": "Invalid credentials" });
+  }
+
+ } catch(err) {
+  next(err);
+ }
 }
 
 /*
